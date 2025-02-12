@@ -46,13 +46,6 @@ public class UserController {
             return ResponseEntity.badRequest().body("User cannot be deleted");
     }
 
-//    @GetMapping("/allUser")
-//    public ResponseEntity<?> getAllUsers(){
-//        try{
-//            return new ResponseEntity<>(userService.getAllUserList(),HttpStatus.OK);
-//        }catch (Exception e){
-//            return ResponseEntity.badRequest().body("No user found");
-//        }
-//    }
+
 
 }
