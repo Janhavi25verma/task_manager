@@ -49,6 +49,8 @@ public class UserServiceImpl implements UserService {
         return UserMapper.mapToUserDto(savedUser);
     }
 
+
+
     @Override
     public Optional<User> getUserById(Long userId) {
         return userRepository.findById(userId);
@@ -87,6 +89,18 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public UserDto createAdmin(UserDto userDto) {
+        if(userDto.getTasks() == null){
+            userDto.setTasks(new ArrayList<>());
+        }
+        User user = UserMapper.mapToUser(userDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("ADMIN"));
+        User savedUser = userRepository.save(user);
+        return UserMapper.mapToUserDto(savedUser);
     }
 
 }

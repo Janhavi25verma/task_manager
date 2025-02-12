@@ -13,4 +13,5 @@ public interface UserService {
     List<User> getAllUserList();
     void updateUser(UserDto userDto);
     boolean deleteUser();
+    UserDto createAdmin(UserDto userDto);
 }
