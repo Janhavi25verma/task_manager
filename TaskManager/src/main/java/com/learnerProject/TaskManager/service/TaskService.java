@@ -3,13 +3,14 @@ package com.learnerProject.TaskManager.service;
 import com.learnerProject.TaskManager.entity.TaskEntry;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TaskService {
 
-  List<TaskEntry> getTasksByUserId(Long userId);
+  List<TaskEntry> getTasksByUser();
 
-  TaskEntry createTask (Long userId, TaskEntry task);
+  boolean updateById(Long taskId, TaskEntry newTask);
 
-  boolean deleteTask (Long userId, Long taskId);
+  TaskEntry createTask (TaskEntry task);
+
+  boolean deleteTask (Long taskId);
 }

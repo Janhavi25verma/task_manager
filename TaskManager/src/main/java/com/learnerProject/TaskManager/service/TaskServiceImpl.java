@@ -6,6 +6,8 @@ import com.learnerProject.TaskManager.repository.TaskEntryRepository;
 import com.learnerProject.TaskManager.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,15 +24,34 @@ public class TaskServiceImpl implements TaskService{
     private UserRepository userRepository;
 
 
-    public List<TaskEntry> getTasksByUserId(Long userId) {
+    public List<TaskEntry> getTasksByUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return taskEntryRepository.findByUser_Email(email);
+    }
 
-        return taskEntryRepository.findByUser_UserId(userId);
+    @Transactional
+    @Override
+    public boolean updateById(Long taskId, TaskEntry newTask) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+        TaskEntry existingTask = taskEntryRepository.findByTaskIdAndUser_Email(taskId, email)
+                .orElseThrow(() -> new RuntimeException("Task not found for the user"));
+
+        existingTask.setTaskCategory(newTask.getTaskCategory());
+        existingTask.setTaskDescription(newTask.getTaskDescription());
+
+        taskEntryRepository.save(existingTask);
+        return true;
     }
 
 
     @Override
-    public TaskEntry createTask(Long userId, TaskEntry task) {
-       Optional<User> user = userRepository.findById(userId);
+    public TaskEntry createTask(TaskEntry task) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+       Optional<User> user = userRepository.findByEmail(email);
 
        if(user.isEmpty()){
            return null;
@@ -46,9 +67,12 @@ public class TaskServiceImpl implements TaskService{
 
 
     @Transactional
-    public boolean deleteTask(Long userId, Long taskId) {
+    public boolean deleteTask(Long taskId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
         // Fetch task only if it belongs to the given user
-        Optional<TaskEntry> task = taskEntryRepository.findByTaskIdAndUser_UserId(taskId, userId);
+        Optional<TaskEntry> task = taskEntryRepository.findByTaskIdAndUser_Email(taskId, email);
 
         if (task.isPresent()) {
             taskEntryRepository.delete(task.get());
