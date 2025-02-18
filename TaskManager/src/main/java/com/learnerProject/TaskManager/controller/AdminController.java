@@ -25,8 +25,7 @@ public class AdminController {
     //see all user
     @GetMapping("/all-user")
     public ResponseEntity<?> getAllUsers() {
-//        To-Do
-//        redisService.get("All_user_",userService.getClass());
+
         try {
             List<User> userList = userService.getAllUserList();
             return new ResponseEntity<>(userList, HttpStatus.OK);

@@ -19,9 +19,20 @@ public class WeatherService {
     @Value("${service.weather.api.key}")
     private String apiKey;
 
+    @Autowired
+    private RedisService redisService;
+
 
     public WeatherResponse fetchWeather(String city){
-        return weatherClient.getWeather(apiKey,city);
-
+       WeatherResponse weatherResponse = redisService.get("weather_of_"+city,WeatherResponse.class);
+       if(weatherResponse != null){
+           return weatherResponse;
+       }else {
+           WeatherResponse response = weatherClient.getWeather(apiKey, city);
+           if(response != null){
+               redisService.set("weather_of_"+city,response,300l);
+           }
+           return response;
+       }
     }
 }
