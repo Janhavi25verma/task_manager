@@ -3,6 +3,7 @@ package com.learnerProject.TaskManager.controller;
 
 import com.learnerProject.TaskManager.dto.UserDto;
 import com.learnerProject.TaskManager.entity.User;
+import com.learnerProject.TaskManager.service.RedisService;
 import com.learnerProject.TaskManager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,14 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RedisService redisService;
+
+    //see all user
     @GetMapping("/all-user")
     public ResponseEntity<?> getAllUsers() {
+//        To-Do
+//        redisService.get("All_user_",userService.getClass());
         try {
             List<User> userList = userService.getAllUserList();
             return new ResponseEntity<>(userList, HttpStatus.OK);
@@ -28,6 +35,7 @@ public class AdminController {
         }
     }
 
+    //create new user as admin
     @PostMapping("/create-admin")
     public ResponseEntity<?> createAdmin(@RequestBody UserDto userDto){
         try {

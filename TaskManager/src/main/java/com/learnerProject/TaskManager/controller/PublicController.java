@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,16 +46,20 @@ public class PublicController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
+   //To-Do
+   //want to check for incorrect password and if user exists separately and give message accordingly
+   // (currently showing same message in both cases)
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserDto userDto) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(),userDto.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.getEmail());
             String jwt = jwtUtil.generateToken(userDetails.getUsername());
-            return new ResponseEntity<>(jwt,HttpStatus.OK);
+            return new ResponseEntity<>(jwt, HttpStatus.OK);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.badRequest().body("Incorrect Username or Password");
         } catch (Exception e) {
-            return  ResponseEntity.badRequest().body("Incorrect Username or Password");
+            return ResponseEntity.badRequest().body("User does not exist!");
         }
     }
 }

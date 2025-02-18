@@ -22,6 +22,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
+    //Subject is user email
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
@@ -34,19 +35,21 @@ public class JwtUtil {
                 .getPayload();
     }
 
+    //claims are present in payload we are sending empty hashmap
     public String generateToken(String email) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, email);
     }
 
-    private Boolean isTokenExpired(String token){
+    private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
-    private Date extractExpiration(String token){
+    private Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
     }
 
+    //claims send only email, dates
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
@@ -58,7 +61,11 @@ public class JwtUtil {
                 .signWith(getSigningKey())
                 .compact();
     }
-    public Boolean validateToken(String token){
+
+    //To-do
+    //validate token checks for user in DB and user token sent and check expiry
+    //user matching is already implemented in UserDetailsServiceImpl
+    public Boolean validateToken(String token) {
         return !isTokenExpired(token);
     }
 }

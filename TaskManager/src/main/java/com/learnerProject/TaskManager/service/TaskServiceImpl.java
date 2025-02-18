@@ -23,7 +23,7 @@ public class TaskServiceImpl implements TaskService{
     @Autowired
     private UserRepository userRepository;
 
-
+   //Get task for authenticated user
     public List<TaskEntry> getTasksByUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();

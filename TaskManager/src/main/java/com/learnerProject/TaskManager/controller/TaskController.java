@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
+
 @RestController
 @RequestMapping("/task")
 public class TaskController {
@@ -29,6 +29,7 @@ public class TaskController {
     }
 
 
+    //add task for authenticated user
     @PostMapping("/create-task")
     public ResponseEntity<?> createEntry(@RequestBody TaskEntry myTask) {
         try {
@@ -39,7 +40,7 @@ public class TaskController {
         }
     }
 
-
+    //delete task for authenticated user
     @DeleteMapping("/user/{taskId}")
     public ResponseEntity<String> deleteTask(@PathVariable Long taskId) {
         boolean isDeleted = taskService.deleteTask(taskId);
