@@ -1,7 +1,5 @@
 package com.learnerProject.TaskManager.filter;
 
-
-
 import com.learnerProject.TaskManager.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

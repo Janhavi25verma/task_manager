@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
+
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,18 +32,57 @@ public class SpringSecurity {
     @Autowired
     private JwtFilter jwtFilter;
 
+    //BEFORE ssl
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//
+//
+//        return http.authorizeHttpRequests(request -> request
+//                        .requestMatchers("/public/**").permitAll()
+//                        .requestMatchers("/task/**", "/user/**").authenticated()
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .anyRequest().authenticated())
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)//removed httpbasic() and added jwt token
+//                .build();
+//    }
+
+    //AFTER ssl
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .requiresChannel(channel -> channel.anyRequest().requiresSecure()) // Enforce HTTPS
+//                .csrf(AbstractHttpConfigurer::disable)
+//                .authorizeHttpRequests(request -> request
+//                        .requestMatchers("/public/**").permitAll()
+//                        .requestMatchers("/task/**", "/user/**").authenticated()
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//        return http.build();
+//    }
+
+
+    //SSL - added keystore.p12 certificate added configs in application.properties and made changes in
+    // springFilterChain to enforce https
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-
-        return http.authorizeHttpRequests(request -> request
-                        .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/task/**", "/user/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)//removed httpbasic() and added jwt token
-                .build();
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)            )
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/public/health-check").permitAll()
+                    .requestMatchers("/public/login").permitAll()
+                    .anyRequest().authenticated()            )
+            .requiresChannel(channel -> channel
+                    .anyRequest().requiresSecure() // 🔐 Enforce HTTPS for all endpoints
+            )
+                .httpBasic(basic -> {});
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 
 
@@ -63,4 +102,3 @@ public class SpringSecurity {
         return auth.getAuthenticationManager();
     }
 }
-

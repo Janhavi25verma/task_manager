@@ -15,7 +15,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Slf4j
 @Service
 public class RedisService {
-//TO-DO (implementation of redis with api)
+//implementation of redis with weather api
     @Autowired
     private RedisTemplate redisTemplate;
   //get data from redis cache
